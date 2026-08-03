@@ -158,6 +158,7 @@ public class AntOrchard extends ModelTask {
                 orchardListTask();
             }
 
+
             // 执行施肥逻辑
             if (orchardSpreadManure.getValue()) {
                 orchardSpreadManure();
@@ -800,6 +801,14 @@ public class AntOrchard extends ModelTask {
                 return true;
             }
 
+            //配合黑名单的兜底操作
+            String result = AntOrchardRpcCall.finishTask(sceneCode, taskId);
+            JSONObject finishResponse = new JSONObject(result);
+            //检查并标记黑名单任务
+            MessageUtil.checkResultCodeAndMarkTaskBlackList("AntOrchardTaskList", title, finishResponse);
+            if (MessageUtil.checkResultCode(TAG, finishResponse)) {
+                Log.farm("肥料任务🧾完成[" + title + "]");
+            }
             return true;
         } catch (Throwable t) {
             Log.i(TAG, "finishOrchardTask err:");
@@ -841,7 +850,7 @@ public class AntOrchard extends ModelTask {
                     if (MessageUtil.checkResultCode(TAG, triggerJo)) {
                         Log.farm("肥料领取🎖️任务[" + title + "]奖励#获得[" + awardCount + "g]");
                     } else {
-                        Log.record("领取奖励失败: " + triggerJo.toString());
+                        //Log.record("领取奖励失败: " + triggerJo.toString());
                     }
                 }
             } else {

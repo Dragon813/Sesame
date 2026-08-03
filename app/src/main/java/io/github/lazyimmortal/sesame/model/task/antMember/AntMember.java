@@ -1262,8 +1262,10 @@ public class AntMember extends ModelTask {
                 if (!toCompleteVO.has("todayFinish")) {
                     // 领取任务
                     s = AntMemberRpcCall.joinSesameTask(taskTemplateId);
-                    TimeUtil.sleep(200);
                     responseObj = new JSONObject(s);
+                    //检查并标记黑名单任务
+                    MessageUtil.checkResultCodeAndMarkTaskBlackList("MemberCreditSesameTaskList", taskTitle, responseObj);
+                    TimeUtil.sleep(200);
                     if (!MessageUtil.checkResultCode(TAG, responseObj)) {
                         Log.error(TAG + "芝麻信用💳领取任务[" + taskTitle + "]失败#" + s);
                         continue;

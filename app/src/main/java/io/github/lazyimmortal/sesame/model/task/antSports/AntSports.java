@@ -440,7 +440,10 @@ public class AntSports extends ModelTask {
                     continue;
                 }
 
-                Log.record("Found New Sport TaskStatus:" + taskStatus);
+                //兜底操作
+                String taskAction = jo.getString("taskAction");
+                String taskId = jo.getString("taskId");
+                completeTask(taskAction, taskId, taskName);
             }
         } catch (Throwable t) {
             Log.i(TAG, "sportsTasks err:");

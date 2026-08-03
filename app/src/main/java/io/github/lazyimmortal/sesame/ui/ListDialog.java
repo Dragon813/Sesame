@@ -20,6 +20,7 @@ import io.github.lazyimmortal.sesame.data.modelFieldExt.SelectModelField;
 import io.github.lazyimmortal.sesame.data.modelFieldExt.SelectOneModelField;
 import io.github.lazyimmortal.sesame.data.modelFieldExt.common.SelectModelFieldFunc;
 import io.github.lazyimmortal.sesame.entity.AlipayAnimal;
+import io.github.lazyimmortal.sesame.entity.AlipayAntDodoTaskList;
 import io.github.lazyimmortal.sesame.entity.AlipayAntFarmDoFarmTaskList;
 import io.github.lazyimmortal.sesame.entity.AlipayAntFarmDrawMachineTaskList;
 import io.github.lazyimmortal.sesame.entity.AlipayAntForestHuntTaskList;
@@ -298,7 +299,7 @@ public class ListDialog {
         });
         lv_list.setOnItemLongClickListener((p1, p2, p3, p4) -> {
             IdAndName curIdAndName = (IdAndName) p1.getAdapter().getItem(p3);
-            if ((curIdAndName instanceof AlipayTree) || (curIdAndName instanceof AlipayReserve) || (curIdAndName instanceof AlipayAnimal) || (curIdAndName instanceof AlipayMarathon) || (curIdAndName instanceof AlipayNewAncientTree) || (curIdAndName instanceof AlipayBeach) || (curIdAndName instanceof AlipayPlantScene) || (curIdAndName instanceof AlipayrpcRequest) || (curIdAndName instanceof AlipayForestHunt) || (curIdAndName instanceof AlipayMemberCreditSesameTaskList) || (curIdAndName instanceof AlipayAntForestVitalityTaskList) || (curIdAndName instanceof AlipayAntForestHuntTaskList) || (curIdAndName instanceof AlipayAntFarmDoFarmTaskList) || (curIdAndName instanceof AlipayAntFarmDrawMachineTaskList) || (curIdAndName instanceof AlipayAntOceanAntiepTaskList)|| (curIdAndName instanceof AlipayAntOceanFishBlackList) || (curIdAndName instanceof AlipayAntOrchardTaskList) || (curIdAndName instanceof AlipayAntStallTaskList) || (curIdAndName instanceof AlipayAntSportsTaskList) ||(curIdAndName instanceof WalkPathThemeMapList) || (curIdAndName instanceof AlipayAntMemberTaskList) || (curIdAndName instanceof WalkPath)) {
+            if ((curIdAndName instanceof AlipayTree) || (curIdAndName instanceof AlipayReserve) || (curIdAndName instanceof AlipayAnimal) || (curIdAndName instanceof AlipayMarathon) || (curIdAndName instanceof AlipayNewAncientTree) || (curIdAndName instanceof AlipayBeach) || (curIdAndName instanceof AlipayPlantScene) || (curIdAndName instanceof AlipayrpcRequest) || (curIdAndName instanceof AlipayForestHunt) || (curIdAndName instanceof AlipayMemberCreditSesameTaskList) || (curIdAndName instanceof AlipayAntForestVitalityTaskList) || (curIdAndName instanceof AlipayAntForestHuntTaskList) || (curIdAndName instanceof AlipayAntFarmDoFarmTaskList) || (curIdAndName instanceof AlipayAntFarmDrawMachineTaskList) || (curIdAndName instanceof AlipayAntDodoTaskList)|| (curIdAndName instanceof AlipayAntOceanAntiepTaskList)|| (curIdAndName instanceof AlipayAntOceanFishBlackList) || (curIdAndName instanceof AlipayAntOrchardTaskList) || (curIdAndName instanceof AlipayAntStallTaskList) || (curIdAndName instanceof AlipayAntSportsTaskList) ||(curIdAndName instanceof WalkPathThemeMapList) || (curIdAndName instanceof AlipayAntMemberTaskList) || (curIdAndName instanceof WalkPath)) {
                 try {
                     new AlertDialog.Builder(c).setTitle("删除 " + curIdAndName.name).setPositiveButton(c.getString(R.string.ok), (dialog, which) -> {
                         if (which == DialogInterface.BUTTON_POSITIVE) {
@@ -371,6 +372,11 @@ public class ListDialog {
                                 AlipayAntFarmDrawMachineTaskList.remove(curIdAndName.id);
                                 AntFarmDrawMachineTaskListMap.remove(curIdAndName.id);
                                 AntFarmDrawMachineTaskListMap.save();
+                            }
+                            else if (curIdAndName instanceof AlipayAntDodoTaskList) {
+                                AlipayAntDodoTaskList.remove(curIdAndName.id);
+                                AntDodoTaskListMap.remove(curIdAndName.id);
+                                AntDodoTaskListMap.save();
                             }
                             else if (curIdAndName instanceof AlipayAntOceanAntiepTaskList) {
                                 AlipayAntOceanAntiepTaskList.remove(curIdAndName.id);

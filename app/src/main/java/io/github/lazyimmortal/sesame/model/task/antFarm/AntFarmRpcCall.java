@@ -133,13 +133,13 @@ public class AntFarmRpcCall {
 
     //{"bizKey":"ccl_rongrongxiaoji","requestType":"RPC","sceneCode":"ANTFARM","source":"antfarm_villa","taskSceneCode":"ANTFARM_DAILY_DRAW_TASK"}
     public static String doFarmTask(String bizKey, String taskSceneCode) {
-        String args1 = "[{\"bizKey\":\"" + bizKey + "\",\"requestType\":\"RPC\",\"sceneCode\":\"ANTFARM\",\"source\":\"H5\",\"taskSceneCode\":\"" + taskSceneCode + "\"}]";
+        String args1 = "[{\"bizKey\":\"" + bizKey + "\",\"requestType\":\"RPC\",\"sceneCode\":\"ANTFARM\",\"source\":\"H5\",\"taskSceneCode\":\"" + taskSceneCode + "\",\"version\":\"" + VERSION + "\"}]";
         return ApplicationHook.requestString("com.alipay.antfarm.doFarmTask", args1);
     }
 
     //{"bizKey":"SHH_liyunrui","requestType":"NORMAL","sceneCode":"ANTFARM","source":"H5","version":"1.8.2302070202.46"}]}
     public static String doFarmTask(String bizKey) {
-        String args1 = "[{\"bizKey\":\"" + bizKey + "\",\"requestType\":\"RPC\",\"sceneCode\":\"ANTFARM\",\"source\":\"H5\",\"version\":\"" + VERSION + "\"}]";
+        String args1 = "[{\"bizKey\":\""+bizKey+"\",\"requestType\":\"NORMAL\",\"sceneCode\":\"ANTFARM\",\"source\":\"H5\"}]";
         return ApplicationHook.requestString("com.alipay.antfarm.doFarmTask", args1);
     }
 

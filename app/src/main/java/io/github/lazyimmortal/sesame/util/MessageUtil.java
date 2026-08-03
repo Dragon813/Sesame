@@ -207,6 +207,13 @@ public class MessageUtil {
                     }
                     break;
 
+                //神奇物种任务AntDodo
+                case "AntDodoTaskList":
+                    if (canAddBlackList) {
+                        MarkTaskBlackList("AntDodo", listTitle, "神奇物种任务", taskTitle);
+                    }
+                    break;
+
                 //神奇海洋普通任务AntOcean
                 case "AntOceanAntiepTaskList":
                     if (canAddBlackList) {

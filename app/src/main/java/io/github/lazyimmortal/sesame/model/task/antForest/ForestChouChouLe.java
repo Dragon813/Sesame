@@ -17,9 +17,9 @@ import io.github.lazyimmortal.sesame.util.idMap.ForestHuntIdMap;
 import io.github.lazyimmortal.sesame.util.idMap.UserIdMap;
 
 public class ForestChouChouLe {
-    
+
     private static final String TAG = ForestChouChouLe.class.getSimpleName();
-    
+
     void chouChouLe(Boolean ForestHuntDraw, Boolean ForestHuntHelp, Set<String> shareIds, Boolean NORMALForestHuntHelp, Boolean ACTIVITYForestHuntHelp, Set<String> AntForestHuntTaskList) {
         try {
             ForestHuntIdMap.load();
@@ -35,19 +35,18 @@ public class ForestChouChouLe {
             for (int i = 0; i < drawSceneGroups.length(); i++) {
                 JSONObject drawScene = drawSceneGroups.getJSONObject(i);
                 JSONObject drawActivity = drawScene.getJSONObject("drawActivity");
-                
+
                 String activityId = drawActivity.getString("activityId");
                 String drawScenename = drawActivity.getString("name");
                 String sceneCode = drawActivity.getString("sceneCode");
-                
+
                 chouChouLescene(ForestHuntDraw, activityId, drawScenename, sceneCode, ForestHuntHelp, shareIds, NORMALForestHuntHelp, ACTIVITYForestHuntHelp, AntForestHuntTaskList);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.printStackTrace(e);
         }
     }
-    
+
     void chouChouLescene(Boolean ForestHuntDraw, String activityId, String drawScenename, String sceneCode, Boolean ForestHuntHelp, Set<String> shareIds, Boolean NORMALForestHuntHelp, Boolean ACTIVITYForestHuntHelp, Set<String> AntForestHuntTaskList) {
         String taskUid = UserIdMap.getCurrentUid();
         try {
@@ -55,9 +54,9 @@ public class ForestChouChouLe {
             Set<String> presetBad = new LinkedHashSet<>();
             presetBad.add("FOREST_NORMAL_DRAW_SHARE"); // 邀请好友任务（跳过）
             presetBad.add("FOREST_ACTIVITY_DRAW_SHARE");
-            
+
             // =====================================================
-            
+
             int loopCount = 0; // 循环次数计数
             final int MAX_LOOP = 7; // 最大循环次数，避免死循环
 
@@ -84,15 +83,16 @@ public class ForestChouChouLe {
                         JSONObject taskBaseInfo = taskInfo.getJSONObject("taskBaseInfo");
                         JSONObject bizInfo = new JSONObject(taskBaseInfo.getString("bizInfo"));
                         String taskName = bizInfo.getString("title");
+                        String desc = bizInfo.getString("desc");
 
                         String taskSceneCode = taskBaseInfo.getString("sceneCode");
                         String taskStatus = taskBaseInfo.getString("taskStatus");
                         String taskType = taskBaseInfo.getString("taskType");
-                        
+
                         JSONObject taskRights = taskInfo.getJSONObject("taskRights");
                         int rightsTimes = taskRights.getInt("rightsTimes");
                         int rightsTimesLimit = taskRights.getInt("rightsTimesLimit");
-                        
+
                         // 已完成任务领取奖励
                         if (taskStatus.equals("FINISHED")) {
                             TimeUtil.sleep(2000);
@@ -104,13 +104,14 @@ public class ForestChouChouLe {
                                     doublecheck = true;
                                 }
                             }
+                            continue;
                         }
-                        
+
                         //黑名单任务跳过
                         if (AntForestHuntTaskList.contains(taskName)) {
                             continue;
                         }
-                        
+
                         if (taskType.contains("_DRAW_SHARE") && ForestHuntHelp) {
                             // if (!Status.hasFlagToday("Forest::" + sceneCode)) {
                             int forestHuntHelpTodayCount = Status.getforestHuntHelpToday(taskType);
@@ -157,8 +158,7 @@ public class ForestChouChouLe {
                                 }
                                 JSONObject userVitalityInfo = jo.getJSONObject("userVitalityInfoVO");
                                 totalVitalityAmount = userVitalityInfo.optInt("totalVitalityAmount", 0);
-                            }
-                            catch (Throwable th) {
+                            } catch (Throwable th) {
                                 Log.i(TAG, "chouChouLesceneEXCHANGE err:");
                                 Log.printStackTrace(TAG, th);
                             }
@@ -175,7 +175,7 @@ public class ForestChouChouLe {
                             }
                             continue; // 防止进入下面的 FOREST_NORMAL_DRAW 分支
                         }
-                        
+
                         // 统一处理 FOREST_NORMAL_DRAW 和 FOREST_ACTIVITY_DRAW开头任务
                         if ((taskType.startsWith("FOREST_NORMAL_DRAW") || taskType.startsWith("FOREST_ACTIVITY_DRAW")) && taskStatus.equals("TODO")) {
                             TimeUtil.sleep(1000);
@@ -183,12 +183,23 @@ public class ForestChouChouLe {
                             JSONObject result;
                             if (taskType.contains("XLIGHT")) {
                                 result = new JSONObject(AntForestRpcCall.finishTask4Chouchoule(taskType, taskSceneCode));
-                            }
-                            else {
+                            } else {
                                 result = new JSONObject(AntForestRpcCall.finishTaskopengreen(taskType, taskSceneCode));
                             }
                             //检查并标记黑名单任务
-                            MessageUtil.checkResultCodeAndMarkTaskBlackList("AntForestHuntTaskList", taskName,result);
+                            MessageUtil.checkResultCodeAndMarkTaskBlackList("AntForestHuntTaskList", taskName, result);
+                            if (MessageUtil.checkSuccess(TAG, result)) {
+                                Log.forest("森林寻宝🧾完成[" + taskName + "]");
+                                doublecheck = true;
+                            }
+                            continue;
+                        }
+                        if (taskStatus.equals("TODO")) {
+                            //兜底完成任务操作
+                            TimeUtil.sleep(1000);
+                            JSONObject result = new JSONObject(AntForestRpcCall.finishTaskopengreen(taskType, taskSceneCode));
+                            //检查并标记黑名单任务
+                            MessageUtil.checkResultCodeAndMarkTaskBlackList("AntForestHuntTaskList", taskName, result);
                             if (MessageUtil.checkSuccess(TAG, result)) {
                                 Log.forest("森林寻宝🧾完成[" + taskName + "]");
                                 doublecheck = true;
@@ -196,16 +207,15 @@ public class ForestChouChouLe {
                         }
                     }
                 }
-            }
-            while (doublecheck && ++loopCount < MAX_LOOP);
-            
+            } while (doublecheck && ++loopCount < MAX_LOOP);
+
             // ==================== 执行抽奖 ====================
             if (ForestHuntDraw) {
                 JSONObject jo = new JSONObject(AntForestRpcCall.enterDrawActivityopengreen(activityId, sceneCode, "task_entry"));
                 if (MessageUtil.checkSuccess(TAG, jo)) {
                     JSONObject drawAsset = jo.getJSONObject("drawAsset");
                     int blance = drawAsset.getInt("blance");
-                    
+
                     while (blance > 0) {
                         jo = new JSONObject(AntForestRpcCall.drawopengreen(activityId, sceneCode, "task_entry", UserIdMap.getCurrentUid()));
                         if (MessageUtil.checkSuccess(TAG, jo)) {
@@ -219,21 +229,20 @@ public class ForestChouChouLe {
                             if (prizeName.contains("g能量")) {
                                 Statistics.addData(Statistics.DataType.COLLECTED, prizeNum);
                             }
-                        }else{
+                        } else {
                             blance--;
                         }
                     }
                 }
             }
-            
+
             // ==============================================
-            
-        }
-        catch (Exception e) {
+
+        } catch (Exception e) {
             Log.printStackTrace(e);
         }
     }
-    
+
     // kuzVe2lrSrXFdacxxi3KWjxx-4O7FEYDgn0xx0OehP5jt9-YINZOkxgPDkvWvkwkQXSDbZ
     // -77VUJcjlcZsjGio6MsAtmwxkxkx(FOREST_NORMAL_DRAW_SHARE)
     // kuzVe2lrSrXFdacxxi3KWjxx-4O7FEYDgn0xx0OehP5jt9-bxgpIW643h4FnWRjs9uZzng
@@ -242,7 +251,7 @@ public class ForestChouChouLe {
         String taskUid = UserIdMap.getCurrentUid();
         try {
             int forestHuntHelpTodayCount;
-            
+
             for (String shareUserId : shareIds) {
                 forestHuntHelpTodayCount = Status.getforestHuntHelpToday(taskType);
                 // if (!Status.canForestHuntHelpToday(taskType + "::" + shareUserId)) {
@@ -253,11 +262,9 @@ public class ForestChouChouLe {
                 String shareId;
                 if ((shareUserId.length() > 20 && shareUserId.length() < 28) && taskType.equals("FOREST_NORMAL_DRAW_SHARE")) {
                     shareId = shareUserId + "4O7FEYDgn0xx0OehP5jt9" + "YINZOkxgPDkvWvkwkQXSDbZ" + "77VUJcjlcZsjGio6MsAtmwxkxkx";
-                }
-                else if ((shareUserId.length() > 20 && shareUserId.length() < 28) && taskType.equals("FOREST_ACTIVITY_DRAW_SHARE")) {
+                } else if ((shareUserId.length() > 20 && shareUserId.length() < 28) && taskType.equals("FOREST_ACTIVITY_DRAW_SHARE")) {
                     shareId = shareUserId + "4O7FEYDgn0xx0OehP5jt9" + "bxgpIW643h4FnWRjs9uZzng" + "77VUJcjlcZsjGio6MsAtmwxkxkx";
-                }
-                else {
+                } else {
                     Log.forest("森林寻宝🎰️存在错误usershareUserId:" + shareUserId);
                     continue;
                 }
@@ -273,7 +280,7 @@ public class ForestChouChouLe {
                 }
                 String resconfirmShareRecall = confirmShareRecall(activityId, p2pSceneCode, shareId, userId);
                 TimeUtil.sleep(1500);
-                
+
                 String userName = UserIdMap.getShowName(userId) != null ? UserIdMap.getShowName(userId) : userId;
                 Log.forest("森林寻宝👊助力[" + userName + "]" + resconfirmShareRecall);
                 // 标记助力成功
@@ -283,12 +290,11 @@ public class ForestChouChouLe {
                 // 统计场景助力次数
                 Status.forestHuntHelpToday(taskType, forestHuntHelpTodayCount, taskUid);
             }
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             Log.printStackTrace(TAG, t);
         }
     }
-    
+
     private String shareComponentRecall(String sceneCode, String shareId) {
         try {
             JSONObject jo = new JSONObject(AntForestRpcCall.shareComponentRecall(sceneCode, shareId));
@@ -299,20 +305,18 @@ public class ForestChouChouLe {
                 jo = jo.getJSONObject("inviterInfoVo");
                 return jo.getString("userId");
             }
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             Log.i(TAG, "shareComponentRecall err:");
             Log.printStackTrace(TAG, t);
         }
         return "解析userID失败";
     }
-    
+
     private String confirmShareRecall(String activityId, String p2pSceneCode, String shareId, String userId) {
         try {
             JSONObject jo = new JSONObject(AntForestRpcCall.confirmShareRecall(activityId, p2pSceneCode, shareId, userId));
             return jo.getString("desc");
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             Log.i(TAG, "confirmShareRecall err:");
             Log.printStackTrace(TAG, t);
         }

@@ -51,4 +51,9 @@ public class AlipayVersion implements Comparable<AlipayVersion> {
         return compareResult;
     }
 
+    @Override
+    public String toString() {
+        return versionString;
+    }
+
 }

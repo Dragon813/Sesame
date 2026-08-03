@@ -540,7 +540,15 @@ public class FileUtil {
         }
         return file;
     }
-    
+
+    public static File getAntDodoTaskListMapFile() {
+        File file = new File(MAIN_DIRECTORY_FILE, "AntDodoTask.json");
+        if (file.exists() && file.isDirectory()) {
+            file.delete();
+        }
+        return file;
+    }
+
     public static File getAntOceanAntiepTaskListMapFile() {
         File file = new File(MAIN_DIRECTORY_FILE, "AntOceanAntiepTask.json");
         if (file.exists() && file.isDirectory()) {

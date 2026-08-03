@@ -52,6 +52,7 @@ import io.github.lazyimmortal.sesame.util.Log;
 import io.github.lazyimmortal.sesame.util.StringUtil;
 import io.github.lazyimmortal.sesame.util.ToastUtil;
 import io.github.lazyimmortal.sesame.util.idMap.AnimalIdMap;
+import io.github.lazyimmortal.sesame.util.idMap.AntDodoTaskListMap;
 import io.github.lazyimmortal.sesame.util.idMap.AntFarmDoFarmTaskListMap;
 import io.github.lazyimmortal.sesame.util.idMap.AntFarmDrawMachineTaskListMap;
 import io.github.lazyimmortal.sesame.util.idMap.AntForestHuntTaskListMap;
@@ -136,6 +137,7 @@ public class NewSettingsActivity extends BaseActivity {
         AntForestHuntTaskListMap.load();
         AntFarmDoFarmTaskListMap.load();
         AntFarmDrawMachineTaskListMap.load();
+        AntDodoTaskListMap.load();
         AntOceanAntiepTaskListMap.load();
         AntOceanFishBlackListMap.load();
         AntOrchardTaskListMap.load();
