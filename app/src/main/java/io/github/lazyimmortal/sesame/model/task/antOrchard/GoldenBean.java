@@ -60,9 +60,9 @@ public class GoldenBean {
      *
      * @param enabled        金豆夺宝总开关：签到/求签/金猫矿工/金豆乐园(玩游戏刷蛋+砸蛋)/完成任务
      * @param doExchange     肥料换金豆（单独开关，因为会消耗农场肥料）
-     * @param exchangeAmount 每次兑换的肥料数量；0=全换(把当前肥料尽量换掉，仍受每日额度限制)
+     * @param reserveManure  换豆时保留的肥料数量
      */
-    public static void run(boolean enabled, boolean doExchange, int exchangeAmount) {
+    public static void run(boolean enabled, boolean doExchange, int reserveManure) {
         if (!enabled && !doExchange) {
             return;
         }
@@ -84,7 +84,7 @@ public class GoldenBean {
                 playGame();
             }
             if (doExchange) {
-                exchangeManure(index.optJSONObject("manureExchangeInfo"), exchangeAmount);
+                exchangeManure(index.optJSONObject("manureExchangeInfo"), reserveManure);
             }
         } catch (Throwable t) {
             dbg("主流程异常: " + t.getMessage());
@@ -246,12 +246,9 @@ public class GoldenBean {
     }
 
     /**
-     * 肥料换金豆：按配置的兑换数量兑换（0=全换），受每日剩余额度限制，且不低于最低兑换额。
-     * <p>
-     * 支付宝每日兑换上限为 10w 金豆(=10w 肥料)，因此即使填 0(全换)或很大的数，单日也最多换到
-     * 当日剩余额度 remainQuota，肥料很多时需多日才能换完。
+     * 肥料换金豆：仅兑换超出保留数量的部分，受每日剩余额度限制，且不低于最低兑换额。
      */
-    private static void exchangeManure(JSONObject exchangeInfo, int exchangeAmount) {
+    private static void exchangeManure(JSONObject exchangeInfo, int reserveManure) {
         try {
             if (exchangeInfo == null) {
                 dbg("换豆: 无 manureExchangeInfo，跳过");
@@ -267,16 +264,16 @@ public class GoldenBean {
             int minExchange = exchangeInfo.optInt("minExchangeAmount", 800);
             int remainQuota = exchangeInfo.optInt("remainQuota", 0);
 
-            // 目标兑换量：0(或负)=全换(当前肥料)，否则=指定数量(不超过当前肥料)
-            int exchangeable = (exchangeAmount <= 0)
-                    ? currentManure
-                    : Math.min(exchangeAmount, currentManure);
-            // 再受支付宝每日剩余额度约束(每日最多10w)
+            if (reserveManure < 0) {
+                reserveManure = 0;
+            }
+            // 可兑换 = 余额 - 保留数量，再受每日剩余额度约束
+            int exchangeable = currentManure - reserveManure;
             if (exchangeable > remainQuota) {
                 exchangeable = remainQuota;
             }
-            dbg("换豆: 当前肥料=" + currentManure + " 目标兑换=" + (exchangeAmount <= 0 ? "全换" : exchangeAmount)
-                    + " 每日剩余额度=" + remainQuota + " 最低兑换=" + minExchange + " 实际可兑换=" + exchangeable);
+            dbg("换豆: 当前肥料=" + currentManure + " 保留=" + reserveManure + " 每日剩余额度=" + remainQuota
+                    + " 最低兑换=" + minExchange + " 实际可兑换=" + exchangeable);
             if (exchangeable < minExchange) {
                 dbg("换豆: 可兑换 " + exchangeable + " < 最低 " + minExchange + "，跳过");
                 return;

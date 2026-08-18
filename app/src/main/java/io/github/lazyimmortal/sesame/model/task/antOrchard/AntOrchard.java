@@ -94,7 +94,7 @@ public class AntOrchard extends ModelTask {
     // 金豆夺宝（芭芭农场下的新玩法）
     private BooleanModelField goldenBean;
     private BooleanModelField goldenBeanExchangeManure;
-    private IntegerModelField goldenBeanExchangeManureAmount;
+    private IntegerModelField goldenBeanReserveManure;
     private static int fertilizerProgress = 0;
     private static final ArrayList<String> enableSceneList = new ArrayList<>();
 
@@ -128,7 +128,7 @@ public class AntOrchard extends ModelTask {
         modelFields.addField(assistFriendList = new SelectModelField("assistFriendList", "分享助力 | 好友列表", new LinkedHashSet<>(), AlipayUser::getList));
         modelFields.addField(goldenBean = new BooleanModelField("goldenBean", "金豆夺宝 | 一键全自动", false));
         modelFields.addField(goldenBeanExchangeManure = new BooleanModelField("goldenBeanExchangeManure", "金豆夺宝 | 肥料换金豆", false));
-        modelFields.addField(goldenBeanExchangeManureAmount = new IntegerModelField("goldenBeanExchangeManureAmount", "金豆夺宝 | 换金豆肥料数(0=全换)", 0, 0, null));
+        modelFields.addField(goldenBeanReserveManure = new IntegerModelField("goldenBeanReserveManure", "金豆夺宝 | 保留肥料数量", 0, 0, null));
         return modelFields;
     }
 
@@ -179,7 +179,7 @@ public class AntOrchard extends ModelTask {
             // 金豆夺宝：一键全自动 + 肥料换金豆
             if (goldenBean.getValue() || goldenBeanExchangeManure.getValue()) {
                 GoldenBean.run(goldenBean.getValue(), goldenBeanExchangeManure.getValue(),
-                        goldenBeanExchangeManureAmount.getValue());
+                        goldenBeanReserveManure.getValue());
             }
 
         } catch (Throwable t) {
